@@ -75,11 +75,13 @@ class RssSource extends DataSource {
 		$cacheTime = $config['cacheTime'];
 
 		$cachePath = 'rss_'.md5($feedUrl);
-		$data = cache($cachePath, null, $cacheTime);
+		Cache::set(array('duration' => $cacheTime));
+		$data = Cache::read($cachePath);
 
-		if ( !$data ) {
+		if ($data === false) {
 			$data = Set::reverse(new XML($this->config['feedUrl'], array('version' => $this->config['version'], 'encoding' => $this->config['encoding'])));
-			cache($cachePath, serialize($data));
+			Cache::set(array('duration' => $cacheTime));
+			Cache::write($cachePath, serialize($data));
 		}
 		else {
 			$data = unserialize($data);
@@ -177,4 +179,3 @@ class RssSource extends DataSource {
 }
 
 ?>
-
