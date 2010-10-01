@@ -22,7 +22,7 @@ App::import('Datasource', 'Datasources.RssSource');
 
 // Add new db config
 ConnectionManager::create('test_rss', array(
-					'datasource' => 'RssSource',
+					'datasource' => 'RssDatasource.RssSource',
 					'feedUrl' => 'http://loadsys1.com/rss_datasource_test.rss',
 					'encoding' => 'UTF-8',
 					)
