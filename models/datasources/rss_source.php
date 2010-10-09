@@ -22,13 +22,38 @@ App::import('Core',  'Xml');
 
 class RssSource extends DataSource {
 
+	/**
+	 * Default configuration options
+	 * 
+	 * @var array
+	 * @access public
+	 */
 	var $_baseConfig = array(
 		'feedUrl' => false,
 		'encoding' => 'UTF-8',
 		'cacheTime' => '+1 day',
 		'version' => '2.0',
 		);
+		
+	/**
+	 * Should modify to this method to ping or check url to see if it returns a valid
+	 * response.
+	 *
+	 * @return bool
+	 * @access public
+	 */
+	public function isConnected() {
+		return true;
+	}
 
+	/**
+	 * read function.
+	 * 
+	 * @access public
+	 * @param object &$model
+	 * @param array $queryData
+	 * @return array
+	 */
 	function read(&$model, $queryData = array()) {
 		$data = $this->__readData();
 
@@ -65,10 +90,23 @@ class RssSource extends DataSource {
 		return $result;
 	}
 
+	/**
+	 * name function.
+	 * 
+	 * @access public
+	 * @param mixed $name
+	 * @return void
+	 */
 	function name($name) {
 		return $name;
 	}	
 
+	/**
+	 * __readData function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	function __readData() {
 		$config = $this->config;
 		$feedUrl = $config['feedUrl'];
@@ -79,7 +117,15 @@ class RssSource extends DataSource {
 		$data = Cache::read($cachePath);
 
 		if ($data === false) {
-			$data = Set::reverse(new XML($this->config['feedUrl'], array('version' => $this->config['version'], 'encoding' => $this->config['encoding'])));
+			$data = Set::reverse(
+				new XML(
+					$this->config['feedUrl'],
+					array(
+						'version' => $this->config['version'],
+						'encoding' => $this->config['encoding']
+					)
+				)
+			);
 			Cache::set(array('duration' => $cacheTime));
 			Cache::write($cachePath, serialize($data));
 		}
@@ -90,6 +136,14 @@ class RssSource extends DataSource {
 		return $data;
 	}
 	
+	/**
+	 * __filterItems function.
+	 * 
+	 * @access public
+	 * @param mixed $items
+	 * @param mixed $conditions
+	 * @return void
+	 */
 	function __filterItems($items = null, $conditions = null) {
 		if (empty($items) || empty($conditions)) {
 			return $items;
@@ -109,10 +163,26 @@ class RssSource extends DataSource {
 		return $filteredItems;
 	}
 
+	/**
+	 * __passesCondition function.
+	 * 
+	 * @access public
+	 * @param mixed $field
+	 * @param mixed $condition
+	 * @return void
+	 */
 	function __passesCondition($field, $condition) {
         		return preg_match($condition, $field);
 	}
 
+	/**
+	 * __getPage function.
+	 * 
+	 * @access public
+	 * @param mixed $items
+	 * @param array $queryData
+	 * @return void
+	 */
 	function __getPage($items = null, $queryData = array()) {
 		if ( empty($queryData['limit']) ) {
 			return $items;
@@ -126,6 +196,15 @@ class RssSource extends DataSource {
 		return array_slice($items, $offset, $limit);
 	}
 
+	/**
+	 * __sortItems function.
+	 * 
+	 * @access public
+	 * @param mixed &$model
+	 * @param mixed $items
+	 * @param mixed $order
+	 * @return void
+	 */
 	function __sortItems(&$model, $items, $order) {
 		if ( empty($order) || empty($order[0]) ) {
 			return $items;
@@ -173,6 +252,15 @@ class RssSource extends DataSource {
 		return $items;
 	}
 
+	/**
+	 * calculate function.
+	 * 
+	 * @access public
+	 * @param mixed &$model
+	 * @param mixed $func
+	 * @param array $params
+	 * @return void
+	 */
 	function calculate(&$model, $func, $params = array()) {
 		return '__'.$func;
 	}	
