@@ -1,9 +1,7 @@
 See blog post http://blog.loadsys.com/2009/06/19/cakephp-rss-feed-datasource/
 
-`/config/database.php
-<?php
-class DATABASE_CONFIG {
-
+/config/database.php
+`
 	public $feedSource = array(
 	
 		/** Required **/
@@ -15,24 +13,18 @@ class DATABASE_CONFIG {
 		'encoding' => 'UTF-8',
 		'cacheTime' => '+1 day',
 	);
-}
-?>`
+`
 
-`/models/feed.php
-<?php
-class Feed extends AppModel {
+/models/feed.php
+`
 	public $name = 'Feed';
 	public $useDbConfig = 'feedSource';
-}
-?>`
+`
 
-
-`/controllers/feeds_controller.php
-<?php
-class FeedsController extends AppController {
+/controllers/feeds_controller.php
+`
 	public index() {
 		$feeds = $this->Feed->find('all');
 		$this->set(compact('feeds'));
 	}
-}
-?>`
+`
