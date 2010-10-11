@@ -44,7 +44,7 @@ Then in your controller that uses the model, simply use the $this->Model->find('
 	//  app/controllers/feeds_controller.php
 	class FeedsController extends AppController {
 		public $uses = array('Feed');
-		public index() {
+		public function index() {
 			$feeds = $this->Feed->find('all');
 			$this->set(compact('feeds'));
 		}
