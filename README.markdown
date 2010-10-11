@@ -7,9 +7,7 @@ git clone git@github.com:loadsys/CakePHP-RSS-Datasource.git rss
 
 ## Usage
 
-Currently, you must create a different datasource variable for each feed that will be used.
-
-The values shown below under the Optional comment will be set to the values you see there if they are left out. The required options must exist.
+The values shown below under the Optional comment will be set to the values you see there if they are left out. The required options must exist. If you wish, you can make different database config property for each different feed you would like to work with. The feedUrl is an optional parameter that will be used by default if it is not set in the model.
 
 	<?php
 	//  app/config/database.php
@@ -19,22 +17,24 @@ The values shown below under the Optional comment will be set to the values you 
 			/** Required **/
 			'datasource' => 'rss.rss',
 			'database' => false,
-			'feedUrl' => 'http://feedurl',
 			
 			/** Optional **/
+			'feedUrl' => 'http://feedurl',
 			'encoding' => 'UTF-8',
 			'cacheTime' => '+1 day',
 		);
 	}
 	?>
 
-Inside of each model that will consume an RSS feed, change the $useDbConfig property to the appropriate feed property from the database.php file.
+Inside of each model that will consume an RSS feed, change the $useDbConfig property to the appropriate feed property from the database.php file. If you are instead using a single database config property, you would set the feed url in the model. The public $feedUrl is read before a read, and takes priority over the feedUrl set in the database config property.
 
 	<?php
 	//  app/models/feed.php
 	class Feed extends AppModel {
 		public $name = 'Feed';
 		public $useDbConfig = 'feedSource';
+		/** Optional **/
+		public $feedUrl = 'http://feedUrl';
 	}
 	?>
 

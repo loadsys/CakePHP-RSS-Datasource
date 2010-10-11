@@ -33,10 +33,10 @@ class RssSource extends DataSource {
 		'encoding' => 'UTF-8',
 		'cacheTime' => '+1 day',
 		'version' => '2.0',
-		);
+	);
 		
 	/**
-	 * Should modify to this method to ping or check url to see if it returns a valid
+	 * Should modify this method to ping or check url to see if it returns a valid
 	 * response.
 	 *
 	 * @return bool
@@ -55,6 +55,9 @@ class RssSource extends DataSource {
 	 * @return array
 	 */
 	function read(&$model, $queryData = array()) {
+		if (isset($model->feedUrl) && !empty($model->feedUrl)) {
+			$this->config['feedUrl'] = $model->feedUrl;
+		}
 		$data = $this->__readData();
 
 		$channel = Set::extract($data, 'Rss.Channel');
