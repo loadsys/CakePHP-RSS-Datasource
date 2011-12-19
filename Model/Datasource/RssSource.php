@@ -18,7 +18,7 @@
  * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-App::import('Core',  'Xml');
+App::uses('Xml',  'Utility');
 
 class RssSource extends DataSource {
 
@@ -237,7 +237,7 @@ class RssSource extends DataSource {
 			}
 			$sorting[] = $values;
 			
-			switch(low($direction)) {
+			switch(strtolower($direction)) {
 				case 'asc':
 					$direction = SORT_ASC;
 					break;
@@ -245,7 +245,7 @@ class RssSource extends DataSource {
 					$direction = SORT_DESC;
 					break;	
 				default:
-					trigger_error('Invalid sorting direction '. low($direction));
+					trigger_error('Invalid sorting direction '. strtolower($direction));
 			}
 			$sorting[] = $direction; 
 		}
@@ -300,5 +300,3 @@ class RssSource extends DataSource {
 		return false;
 	}
 }
-
-?>
