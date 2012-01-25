@@ -20,7 +20,7 @@
 
 App::uses('Xml',  'Utility');
 
-class RssSource extends DataSource {
+class Rss extends DataSource {
 
 	/**
 	 * Default configuration options
@@ -34,6 +34,8 @@ class RssSource extends DataSource {
 		'cacheTime' => '+1 day',
 		'version' => '2.0',
 	);
+	
+	public $cacheSources = false;
 		
 	/**
 	 * Should modify this method to ping or check url to see if it returns a valid
@@ -60,12 +62,12 @@ class RssSource extends DataSource {
 		}
 		$data = $this->__readData();
 
-		$channel = Set::extract($data, 'Rss.Channel');
-		if ( isset($channel['Item']) ) {
-			unset($channel['Item']);
+		$channel = Set::extract($data, 'rss.channel');
+		if ( isset($channel['item']) ) {
+			unset($channel['item']);
 		}
 
-		$items = Set::extract($data, 'Rss.Channel.Item');
+		$items = Set::extract($data, 'rss.channel.item');
 
 		if ( $items ) {
 			$items = $this->__filterItems($items, $queryData['conditions']);
@@ -88,7 +90,7 @@ class RssSource extends DataSource {
 		$result = array();
 		if (is_array($items)) {
 			foreach($items as $item) {
-				$item['Channel'] = $channel;
+				$item['channel'] = $channel;
 				$result[] = array($model->alias => $item);
 			}
 		}
@@ -123,7 +125,7 @@ class RssSource extends DataSource {
 
 		if ($data === false) {
 			$data = Set::reverse(
-				new XML(
+				Xml::build(
 					$this->config['feedUrl'],
 					array(
 						'version' => $this->config['version'],
@@ -131,6 +133,7 @@ class RssSource extends DataSource {
 					)
 				)
 			);
+
 			Cache::set(array('duration' => $cacheTime));
 			Cache::write($cachePath, serialize($data));
 		}
@@ -235,7 +238,7 @@ class RssSource extends DataSource {
 					$values[$i] = strtotime($value);
 				}
 			}
-			$sorting[] = $values;
+			$sorting[] =& $values;
 			
 			switch(strtolower($direction)) {
 				case 'asc':
@@ -247,11 +250,11 @@ class RssSource extends DataSource {
 				default:
 					trigger_error('Invalid sorting direction '. strtolower($direction));
 			}
-			$sorting[] = $direction; 
+			$sorting[] =& $direction; 
 		}
 		
-		$sorting[] = &$items;
-		$sorting[] = $direction; 
+		$sorting[] =& $items;
+		$sorting[] =& $direction;
 		call_user_func_array('array_multisort', $sorting);
 	
 		return $items;
