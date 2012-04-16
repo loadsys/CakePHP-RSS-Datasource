@@ -13,8 +13,8 @@
  * @filesource
  * @copyright     Copyright 2009, Loadsys Consulting, Inc. (http://www.loadsys.com)
  * @version       $1.0$
- * @modifiedby    $LastChangedBy: Donatas Kairys (Loadsys) $
- * @lastmodified  $Date: 2009-06-01$
+ * @modifiedby    $LastChangedBy: Joey Trapp (Loadsys) $
+ * @lastmodified  $Date: 2010-10-11$
  * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
@@ -22,14 +22,42 @@ App::import('Core',  'Xml');
 
 class RssSource extends DataSource {
 
-	var $_baseConfig = array(
+	/**
+	 * Default configuration options
+	 * 
+	 * @var array
+	 * @access public
+	 */
+	public $_baseConfig = array(
 		'feedUrl' => false,
 		'encoding' => 'UTF-8',
 		'cacheTime' => '+1 day',
 		'version' => '2.0',
-		);
+	);
+		
+	/**
+	 * Should modify this method to ping or check url to see if it returns a valid
+	 * response.
+	 *
+	 * @return bool
+	 * @access public
+	 */
+	public function isConnected() {
+		return true;
+	}
 
-	function read(&$model, $queryData = array()) {
+	/**
+	 * read function.
+	 * 
+	 * @access public
+	 * @param object &$model
+	 * @param array $queryData
+	 * @return array
+	 */
+	public function read(&$model, $queryData = array()) {
+		if (isset($model->feedUrl) && !empty($model->feedUrl)) {
+			$this->config['feedUrl'] = $model->feedUrl;
+		}
 		$data = $this->__readData();
 
 		$channel = Set::extract($data, 'Rss.Channel');
@@ -51,25 +79,40 @@ class RssSource extends DataSource {
 			if ( Set::extract($queryData, 'fields') == '__count' ) {
 				return array(array($model->alias => array('count' => count($items))));
 			}
-		}
-		else {
+		} else {
 			if ( Set::extract($queryData, 'fields') == '__count' ) {
 				return array(array($model->alias => array('count' => count($items))));
 			}
 		}
 
-		foreach($items as $item) {
-			$item['Channel'] = $channel;
-			$result[] = array($model->alias => $item);
+		$result = array();
+		if (is_array($items)) {
+			foreach($items as $item) {
+				$item['Channel'] = $channel;
+				$result[] = array($model->alias => $item);
+			}
 		}
 		return $result;
 	}
 
-	function name($name) {
+	/**
+	 * name function.
+	 * 
+	 * @access public
+	 * @param mixed $name
+	 * @return void
+	 */
+	public function name($name) {
 		return $name;
 	}	
 
-	function __readData() {
+	/**
+	 * __readData function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function __readData() {
 		$config = $this->config;
 		$feedUrl = $config['feedUrl'];
 		$cacheTime = $config['cacheTime'];
@@ -79,7 +122,15 @@ class RssSource extends DataSource {
 		$data = Cache::read($cachePath);
 
 		if ($data === false) {
-			$data = Set::reverse(new XML($this->config['feedUrl'], array('version' => $this->config['version'], 'encoding' => $this->config['encoding'])));
+			$data = Set::reverse(
+				new XML(
+					$this->config['feedUrl'],
+					array(
+						'version' => $this->config['version'],
+						'encoding' => $this->config['encoding']
+					)
+				)
+			);
 			Cache::set(array('duration' => $cacheTime));
 			Cache::write($cachePath, serialize($data));
 		}
@@ -90,7 +141,15 @@ class RssSource extends DataSource {
 		return $data;
 	}
 	
-	function __filterItems($items = null, $conditions = null) {
+	/**
+	 * __filterItems function.
+	 * 
+	 * @access public
+	 * @param mixed $items
+	 * @param mixed $conditions
+	 * @return void
+	 */
+	public function __filterItems($items = null, $conditions = null) {
 		if (empty($items) || empty($conditions)) {
 			return $items;
 		}
@@ -109,11 +168,27 @@ class RssSource extends DataSource {
 		return $filteredItems;
 	}
 
-	function __passesCondition($field, $condition) {
+	/**
+	 * __passesCondition function.
+	 * 
+	 * @access public
+	 * @param mixed $field
+	 * @param mixed $condition
+	 * @return void
+	 */
+	public function __passesCondition($field, $condition) {
         		return preg_match($condition, $field);
 	}
 
-	function __getPage($items = null, $queryData = array()) {
+	/**
+	 * __getPage function.
+	 * 
+	 * @access public
+	 * @param mixed $items
+	 * @param array $queryData
+	 * @return void
+	 */
+	public function __getPage($items = null, $queryData = array()) {
 		if ( empty($queryData['limit']) ) {
 			return $items;
 		}
@@ -126,7 +201,16 @@ class RssSource extends DataSource {
 		return array_slice($items, $offset, $limit);
 	}
 
-	function __sortItems(&$model, $items, $order) {
+	/**
+	 * __sortItems function.
+	 * 
+	 * @access public
+	 * @param mixed &$model
+	 * @param mixed $items
+	 * @param mixed $order
+	 * @return void
+	 */
+	public function __sortItems(&$model, $items, $order) {
 		if ( empty($order) || empty($order[0]) ) {
 			return $items;
 		}
@@ -173,9 +257,48 @@ class RssSource extends DataSource {
 		return $items;
 	}
 
-	function calculate(&$model, $func, $params = array()) {
+	/**
+	 * calculate function.
+	 * 
+	 * @access public
+	 * @param mixed &$model
+	 * @param mixed $func
+	 * @param array $params
+	 * @return void
+	 */
+	public function calculate(&$model, $func, $params = array()) {
 		return '__'.$func;
-	}	
+	}
+	
+	/**
+	 * This datasource does not support creating rss feeds
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function create() {
+		return false;
+	}
+	
+	/**
+	 * This datasource does not support updating rss feeds
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function update() {
+		return false;
+	}
+	
+	/**
+	 * This datasource does not support deleting rss feeds
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function delete() {
+		return false;
+	}
 }
 
 ?>
