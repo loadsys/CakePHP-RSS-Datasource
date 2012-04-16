@@ -2,8 +2,14 @@
 
 ## Installation
 
-cd your_app_name/plugins/
-git clone git@github.com:loadsys/CakePHP-RSS-Datasource.git rss
+Get the plugin files.
+
+	cd your_app_name/Plugin/
+	git clone git@github.com:loadsys/CakePHP-RSS-Datasource.git Rss
+
+Add the following line to your bootstrap.php.
+
+	CakePlugin::load('Rss');
 
 ## Usage
 
@@ -15,7 +21,7 @@ The values shown below under the Optional comment will be set to the values you 
 		public $feedSource = array(
 		
 			/** Required **/
-			'datasource' => 'rss.rss',
+			'datasource' => 'Rss.Rss',
 			'database' => false,
 			
 			/** Optional **/
