@@ -1,13 +1,13 @@
-
-
 ## Installation
-
-Get the plugin files.
 
 	cd your_app_name/Plugin/
 	git clone git@github.com:loadsys/CakePHP-RSS-Datasource.git Rss
 
-Add the following line to your bootstrap.php.
+You may optionally want to add it as a submodule instead of the clone command above.
+
+	git submodule add git@github.com:loadsys/CakePHP-RSS-Datasource.git Rss
+
+Also, add the following line to your bootstrap.php.
 
 	CakePlugin::load('Rss');
 
@@ -19,11 +19,11 @@ The values shown below under the Optional comment will be set to the values you 
 	//  app/config/database.php
 	class DATABASE_CONFIG {
 		public $feedSource = array(
-		
+
 			/** Required **/
 			'datasource' => 'Rss.Rss',
 			'database' => false,
-			
+
 			/** Optional **/
 			'feedUrl' => 'http://feedurl',
 			'encoding' => 'UTF-8',
