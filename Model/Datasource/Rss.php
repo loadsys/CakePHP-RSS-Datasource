@@ -56,7 +56,7 @@ class Rss extends DataSource {
 	 * @param array $queryData
 	 * @return array
 	 */
-	public function read(&$model, $queryData = array()) {
+	public function read(Model $model, $queryData = array(), $recursive = NULL) {
 		if (isset($model->feedUrl) && !empty($model->feedUrl)) {
 			$this->config['feedUrl'] = $model->feedUrl;
 		}
@@ -279,7 +279,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function create() {
+	public function create(Model $model, $fields = NULL, $values = NULL) {
 		return false;
 	}
 	
@@ -289,7 +289,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function update() {
+	public function update(Model $model, $fields = NULL, $values = NULL, $conditions = NULL) {
 		return false;
 	}
 	
@@ -299,7 +299,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function delete() {
+	public function delete(Model $model, $conditions = NULL) {
 		return false;
 	}
 }
